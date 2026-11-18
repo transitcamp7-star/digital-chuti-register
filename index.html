@@ -29,15 +29,10 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div class="tabs">
 <button class="tab active" data-tab="public">ছুটির হিসাব দেখুন</button>
 <button class="tab" data-tab="admin">অ্যাডমিন লগইন</button>
-<button class="tab" data-tab="setup">সংযোগ সেটিংস</button>
+<button class="tab" 
 </div>
 
-<section id="setup" class="panel hidden">
-<h2>Supabase সংযোগ সেটিংস</h2>
-<p class="muted">Supabase Project Settings → API থেকে Project URL এবং anon/public key বসান। কখনো service_role বা secret key দেবেন না।</p>
-<div class="field"><label>Project URL</label><input id="url" placeholder="https://xxxxxxxx.supabase.co"></div>
-<div class="field"><label>Anon / Publishable key</label><textarea id="key" placeholder="sb_publishable_... অথবা পুরোনো anon public key"></textarea></div>
-<button id="saveConfig">সংরক্ষণ ও সংযোগ</button><div id="configMsg" class="status"></div>
+
 </section>
 
 <section id="public" class="panel">
@@ -113,26 +108,21 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 </div></section>
 </main><footer>ডিজিটাল ছুটি রেজিস্টার · Supabase ও GitHub Pages</footer>
 <script>
-let sb=null, employees=[], leaveRecords=[];
+const SUPABASE_URL='https://osalmonlpsemgtxvexos.supabase.co';
+const SUPABASE_KEY='sb_publishable_IaSJLrG3yss91y1tQGQzlw_yPurQ_WO';
+let sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY), employees=[], leaveRecords=[];
 const $=id=>document.getElementById(id);
 function msg(id,text,kind='status'){ $(id).className='status '+kind; $(id).textContent=text; }
-function connect(){
- const u=localStorage.getItem('leave_supabase_url'), k=localStorage.getItem('leave_supabase_key');
- if(u&&k&&window.supabase){ sb=window.supabase.createClient(u,k); return true; } return false;
-}
+function connect(){return !!sb;}
 const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গড় বেতনের অর্জিত ছুটি',permission:'অনুমতি ছুটি',rrl:'আরআরএল'};
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
- ['public','admin','setup'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
+ ['public','admin',''].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
 });
-$('saveConfig').onclick=()=>{
- const u=$('url').value.trim(),k=$('key').value.trim();
- if(!u.startsWith('https://')||!k){msg('configMsg','Project URL এবং anon/public key দিন।','error');return;}
- localStorage.setItem('leave_supabase_url',u);localStorage.setItem('leave_supabase_key',k);
- connect();msg('configMsg','সংযোগের তথ্য এই ব্রাউজারে সংরক্ষিত হয়েছে।','success');
+
 };
 $('lookupBtn').onclick=async()=>{
- if(!connect()){msg('lookupMsg','প্রথমে সংযোগ সেটিংসে Supabase URL ও anon key দিন।','error');return;}
+
  const code=$('lookupId').value.trim(); if(!code){msg('lookupMsg','কর্মচারী আইডি লিখুন।','error');return;}
  $('publicResult').innerHTML='';msg('lookupMsg','খোঁজা হচ্ছে…');
  const {data,error}=await sb.rpc('lookup_employee_leave',{p_employee_code:code});
@@ -148,7 +138,7 @@ $('lookupBtn').onclick=async()=>{
 };
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 $('loginBtn').onclick=async()=>{
- if(!connect()){msg('loginMsg','প্রথমে সংযোগ সেটিংসে Supabase URL ও anon key দিন।','error');return;}
+
  const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
  if(error){msg('loginMsg',error.message,'error');return;}
  await showAdmin(data.user);
