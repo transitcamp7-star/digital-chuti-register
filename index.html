@@ -118,7 +118,6 @@ const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গ�
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
  ['public','admin'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
-});
 $('lookupBtn').onclick=async()=>{
 $('lookupBtn').onclick=async()=>{
 
