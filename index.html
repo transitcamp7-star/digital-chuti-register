@@ -117,10 +117,9 @@ function connect(){return !!sb;}
 const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গড় বেতনের অর্জিত ছুটি',permission:'অনুমতি ছুটি',rrl:'আরআরএল'};
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
- ['public','admin',''].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
+ ['public','admin'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
 });
-
-};
+$('lookupBtn').onclick=async()=>{
 $('lookupBtn').onclick=async()=>{
 
  const code=$('lookupId').value.trim(); if(!code){msg('lookupMsg','কর্মচারী আইডি লিখুন।','error');return;}
