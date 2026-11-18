@@ -272,7 +272,10 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div class="panel">
 <h2>ছুটির মোট বরাদ্দ পরিবর্তন</h2>
 <div class="grid">
-<div class="field"><label>কর্মচারী</label><select id="entEmployee"></select></div>
+<div class="field"><label>কর্মচারী</label><select id="entEmployee"></select></div><div class="field">
+  <label>হিসাবের বছর</label>
+  <select id="entYear"></select>
+</div>
 <div class="field"><label>ছুটির ধরন</label>
 <select id="entType">
 <option value="casual">নৈমিত্তিক ছুটি</option>
@@ -280,7 +283,10 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <option value="permission">অনুমতি ছুটি</option>
 <option value="rrl">আরআরএল</option>
 </select></div>
-<div class="field"><label>মোট বরাদ্দ (দিন)</label><input id="entTotal" type="number" min="0" step="0.5"></div>
+<div class="field"><label>মোট বরাদ্দ (দিন)</label><input id="entTotal" type="number" min="0" step="0.5"></div><div class="field">
+  <label>আগের বছর থেকে জমা অর্জিত ছুটি</label>
+  <input id="entOpening" type="number" min="0" step="0.5" value="0">
+</div>
 </div>
 <button id="saveEntitlement">বরাদ্দ সংরক্ষণ</button>
 <div id="entMsg"></div>
@@ -312,7 +318,29 @@ function msg(id,text,kind='status'){
 function esc(v){
  return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গড় বেতনের অর্জিত ছুটি',permission:'অনুমতি ছুটি',rrl:'আরআরএল'};
+const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গড় বেতনের অর্জিত ছুটি',permission:'অনুমতি ছুটি',rrl:'আরআরএল'};// বছর নির্বাচন
+const currentYear = Math.max(2026, new Date().getFullYear());
+
+function fillYearOptions(id, includeFuture=false){
+ const el=$(id);
+ if(!el)return;
+ const lastYear=includeFuture?currentYear+5:currentYear;
+ el.innerHTML='';
+ for(let y=lastYear;y>=2026;y--){
+  el.add(new Option(y+' সাল',y));
+ }
+ el.value=currentYear;
+}
+
+fillYearOptions('lookupYear');
+fillYearOptions('entYear',true);
+
+const defaultLeaveDays={
+ casual:20,
+ earned:50,
+ permission:10,
+ rrl:15
+};
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
@@ -329,9 +357,11 @@ $('lookupBtn').onclick=async()=>{
  $('portalArea').classList.add('hidden');
  msg('lookupMsg','যাচাই করা হচ্ছে…');
 
- const {data,error}=await sb.rpc('lookup_employee_leave_with_pin',{
-  p_employee_code:code,p_pin:pin
- });
+ const {data,error}=await sb.rpc('lookup_employee_leave_with_pin_year',{
+  p_employee_code:code,
+  p_pin:pin,
+  p_year:Number($('lookupYear').value)
+});
  if(error){msg('lookupMsg','ডেটাবেসে সমস্যা: '+error.message,'error');return;}
  if(!data||data.error){msg('lookupMsg',data?.error||'তথ্য পাওয়া যায়নি।','error');return;}
  if(!data.employee||!Array.isArray(data.balances)||!Array.isArray(data.records)){
@@ -347,7 +377,7 @@ $('lookupBtn').onclick=async()=>{
   <strong>${esc(b.remaining)} দিন</strong>
   <span class="muted">ব্যবহৃত ${esc(b.used)} / মোট ${esc(b.total)} দিন</span></div>`;
  }
- out+='</div></div><div class="panel"><h2>ছুটির রেকর্ড</h2><div class="tablewrap"><table><thead><tr><th>ধরন</th><th>দিন</th><th>শুরু</th><th>শেষ</th><th>মন্তব্য</th></tr></thead><tbody>';
+ out+='</div></div><div class="panel"><h2>'+Number($('lookupYear').value)+' সালের ছুটির রেকর্ড</h2><div class="tablewrap"><table><thead><tr><th>ধরন</th><th>দিন</th><th>শুরু</th><th>শেষ</th><th>মন্তব্য</th></tr></thead><tbody>';
  for(const r of data.records){
   out+=`<tr><td>${esc(leaveNames[r.leave_type]||r.leave_type)}</td>
   <td>${esc(r.days)}</td><td>${esc(r.start_date||'')}</td>
@@ -695,22 +725,67 @@ $('deleteLeave').onclick=async()=>{
  msg('editLeaveMsg','ছুটির রেকর্ড মুছে ফেলা হয়েছে।','success');await loadLeaveRecords();
 };
 
-// ছুটির বরাদ্দ
+
+// বছরভিত্তিক ছুটির বরাদ্দ
 async function loadEntitlement(){
- const emp=$('entEmployee').value,typ=$('entType').value;
- if(!emp)return;
- const {data,error}=await sb.from('employee_leave_entitlements').select('total_days').eq('employee_id',emp).eq('leave_type',typ).maybeSingle();
- if(error){msg('entMsg','বরাদ্দের তথ্য আনা যায়নি: '+error.message,'error');return;}
- $('entTotal').value=data?data.total_days:'';
+ const emp=$('entEmployee').value;
+ const typ=$('entType').value;
+ const year=Number($('entYear').value);
+ if(!emp||!year)return;
+
+ $('entOpening').disabled=(typ!=='earned');
+
+ const {data,error}=await sb
+  .from('employee_yearly_leave_entitlements')
+  .select('annual_days,opening_balance')
+  .eq('employee_id',emp)
+  .eq('leave_year',year)
+  .eq('leave_type',typ)
+  .maybeSingle();
+
+ if(error){
+  msg('entMsg','বরাদ্দের তথ্য আনা যায়নি: '+error.message,'error');
+  return;
+ }
+
+ $('entTotal').value=data?data.annual_days:defaultLeaveDays[typ];
+ $('entOpening').value=data?data.opening_balance:0;
 }
+
 $('entEmployee').onchange=loadEntitlement;
 $('entType').onchange=loadEntitlement;
+$('entYear').onchange=loadEntitlement;
+
 $('saveEntitlement').onclick=async()=>{
- const employee_id=$('entEmployee').value,leave_type=$('entType').value,total_days=Number($('entTotal').value);
- if(!employee_id||$('entTotal').value===''||!Number.isFinite(total_days)||total_days<0){msg('entMsg','সঠিক মোট বরাদ্দ লিখুন।','error');return;}
- const {error}=await sb.from('employee_leave_entitlements').upsert({employee_id,leave_type,total_days,updated_at:new Date().toISOString()},{onConflict:'employee_id,leave_type'});
- if(error){msg('entMsg','বরাদ্দ পরিবর্তন হয়নি: '+error.message,'error');return;}
- msg('entMsg','ছুটির মোট বরাদ্দ সফলভাবে পরিবর্তন হয়েছে।','success');
+ const employee_id=$('entEmployee').value;
+ const leave_type=$('entType').value;
+ const leave_year=Number($('entYear').value);
+ const annual_days=Number($('entTotal').value);
+ const opening_balance=leave_type==='earned'
+  ?Number($('entOpening').value):0;
+
+ if(!employee_id||!leave_year||$('entTotal').value===''||
+ !Number.isFinite(annual_days)||annual_days<0||
+ !Number.isFinite(opening_balance)||opening_balance<0){
+  msg('entMsg','সঠিক বরাদ্দ ও জমা ছুটির পরিমাণ লিখুন।','error');
+  return;
+ }
+
+ const {error}=await sb.from('employee_yearly_leave_entitlements')
+ .upsert({
+  employee_id,leave_year,leave_type,
+  annual_days,opening_balance,
+  updated_at:new Date().toISOString()
+ },{
+  onConflict:'employee_id,leave_year,leave_type'
+ });
+
+ if(error){
+  msg('entMsg','বরাদ্দ পরিবর্তন হয়নি: '+error.message,'error');
+  return;
+ }
+
+ msg('entMsg',leave_year+' সালের ছুটির বরাদ্দ সফলভাবে সংরক্ষণ হয়েছে।','success');
 };
 
 $('refreshEmployees').onclick=loadEmployees;
