@@ -14,7 +14,8 @@ header{background:linear-gradient(120deg,#102f50,#1769aa);color:white;padding:22
 header h1{margin:0;font-size:24px}
 header p{margin:5px 0 0;color:#dbeafe}
 main{max-width:1100px;margin:22px auto;padding:0 16px}
-.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs,.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tabs{margin-bottom:16px}
 button,.tab{border:0;border-radius:10px;padding:10px 15px;background:var(--blue);color:#fff;cursor:pointer;font:inherit}
 .tab{background:#e4edf7;color:var(--navy)}
 .tab.active{background:var(--navy);color:white}
@@ -23,9 +24,8 @@ h2{font-size:19px;margin:0 0 14px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 label{display:block;font-size:14px;color:var(--muted);margin-bottom:5px}
 input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:9px;font:inherit;background:white;color:var(--ink)}
-textarea{min-height:70px}
+textarea{min-height:90px}
 .field{margin-bottom:12px}
-.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
 .row>*{flex:1}
 .muted{color:var(--muted);font-size:13px}
 .hidden{display:none!important}
@@ -41,31 +41,31 @@ th{background:#f8fafc}
 .tablewrap{overflow:auto}
 .danger{background:#b42318}
 .secondary{background:#64748b}
+.post{border:1px solid var(--line);padding:15px;border-radius:12px;margin:12px 0;background:#fff}
+.post h3{margin:0 0 8px}
+.post-content{white-space:pre-wrap;line-height:1.8}
+.menu-button{background:#e8f1fa;color:var(--navy);margin:4px}
+.menu-button.active{background:var(--navy);color:white}
 footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
-@media(max-width:600px){
- header h1{font-size:20px}
- .panel{padding:14px}
- th,td{padding:8px}
-}
+@media(max-width:600px){header h1{font-size:20px}.panel{padding:14px}th,td{padding:8px}}
 </style>
 </head>
 <body>
 
 <header>
 <h1>ডিজিটাল ছুটি রেজিস্টার</h1>
-<p>কর্মচারীদের ছুটির হিসাব ও রেকর্ড</p>
+<p>কর্মচারীদের ছুটির হিসাব, নোটিশ ও তথ্যকেন্দ্র</p>
 </header>
 
 <main>
-
 <div class="tabs">
-<button class="tab active" data-tab="public">ছুটির হিসাব দেখুন</button>
+<button class="tab active" data-tab="public">কর্মচারী লগইন</button>
 <button class="tab" data-tab="admin">অ্যাডমিন লগইন</button>
 </div>
 
-<!-- কর্মচারীর PIN লগইন -->
+<!-- কর্মচারী লগইন -->
 <section id="public" class="panel">
-<h2>কর্মচারীর ছুটির হিসাব</h2>
+<h2>কর্মচারীর ছুটির হিসাব ও তথ্যকেন্দ্র</h2>
 <p class="muted">নিজের কর্মচারী আইডি ও ৪ সংখ্যার PIN দিয়ে প্রবেশ করুন।</p>
 
 <div class="grid">
@@ -78,80 +78,121 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <input id="lookupPin" type="password" inputmode="numeric" maxlength="4" placeholder="৪ সংখ্যার PIN">
 </div>
 </div>
-
-<button id="lookupBtn">ছুটির হিসাব দেখুন</button>
+<button id="lookupBtn">প্রবেশ করুন</button>
 <div id="lookupMsg"></div>
 <div id="publicResult"></div>
 
+<div id="portalArea" class="hidden">
 <hr style="border:0;border-top:1px solid #e2e8f0;margin:22px 0">
+<h2>সদস্য তথ্যকেন্দ্র</h2>
+<p class="muted">আপনার জন্য প্রকাশিত নোটিশ ও তথ্য এখানে দেখা যাবে।</p>
+<div id="portalMenu"></div>
+<div id="portalPosts"></div>
+</div>
 
+<hr style="border:0;border-top:1px solid #e2e8f0;margin:22px 0">
 <h2>প্রথমবার PIN সেট করুন</h2>
 <p class="muted">অ্যাডমিনের কাছ থেকে পাওয়া অ্যাক্টিভেশন কোড ব্যবহার করে নিজের PIN তৈরি করুন।</p>
-
 <div class="grid">
-<div class="field">
-<label>কর্মচারী আইডি</label>
-<input id="setupEmployeeId" placeholder="কর্মচারী আইডি লিখুন">
+<div class="field"><label>কর্মচারী আইডি</label><input id="setupEmployeeId"></div>
+<div class="field"><label>অ্যাক্টিভেশন কোড</label><input id="activationCode"></div>
+<div class="field"><label>নিজের নতুন ৪ সংখ্যার PIN</label><input id="newPin" type="password" inputmode="numeric" maxlength="4"></div>
+<div class="field"><label>নতুন PIN আবার লিখুন</label><input id="confirmPin" type="password" inputmode="numeric" maxlength="4"></div>
 </div>
-<div class="field">
-<label>অ্যাক্টিভেশন কোড</label>
-<input id="activationCode" placeholder="অ্যাডমিনের দেওয়া কোড">
-</div>
-<div class="field">
-<label>নিজের নতুন ৪ সংখ্যার PIN</label>
-<input id="newPin" type="password" inputmode="numeric" maxlength="4" placeholder="নতুন PIN">
-</div>
-<div class="field">
-<label>নতুন PIN আবার লিখুন</label>
-<input id="confirmPin" type="password" inputmode="numeric" maxlength="4" placeholder="PIN নিশ্চিত করুন">
-</div>
-</div>
-
 <button id="setPinBtn">নিজের PIN সেট করুন</button>
 <div id="setPinMsg"></div>
 </section>
 
 <!-- অ্যাডমিন -->
 <section id="admin" class="panel hidden">
-
 <div id="loginPanel" class="panel">
 <h2>অ্যাডমিন লগইন</h2>
 <div class="grid">
-<div class="field">
-<label>ইমেইল</label>
-<input id="email" type="email" autocomplete="username">
-</div>
-<div class="field">
-<label>পাসওয়ার্ড</label>
-<input id="password" type="password" autocomplete="current-password">
-</div>
+<div class="field"><label>ইমেইল</label><input id="email" type="email" autocomplete="username"></div>
+<div class="field"><label>পাসওয়ার্ড</label><input id="password" type="password" autocomplete="current-password"></div>
 </div>
 <button id="loginBtn">লগইন করুন</button>
 <div id="loginMsg"></div>
 </div>
 
 <div id="adminPanel" class="hidden">
-
 <div class="panel row">
-<div>
-<h2>অ্যাডমিন ড্যাশবোর্ড</h2>
-<span class="muted" id="adminEmail"></span>
-</div>
+<div><h2>অ্যাডমিন ড্যাশবোর্ড</h2><span class="muted" id="adminEmail"></span></div>
 <button id="logoutBtn" class="secondary">লগআউট</button>
 </div>
 
-<!-- নতুন: PIN অ্যাক্টিভেশন কোড -->
+<!-- পাসওয়ার্ড পরিবর্তন -->
+<div class="panel">
+<h2>অ্যাডমিন পাসওয়ার্ড পরিবর্তন</h2>
+<p class="muted">বর্তমান পাসওয়ার্ড যাচাই করে নতুন পাসওয়ার্ড সেট করুন।</p>
+<div class="grid">
+<div class="field"><label>বর্তমান পাসওয়ার্ড</label><input id="currentAdminPassword" type="password" autocomplete="current-password"></div>
+<div class="field"><label>নতুন পাসওয়ার্ড</label><input id="newAdminPassword" type="password" autocomplete="new-password"></div>
+<div class="field"><label>নতুন পাসওয়ার্ড আবার লিখুন</label><input id="confirmAdminPassword" type="password" autocomplete="new-password"></div>
+</div>
+<button id="changeAdminPassword">পাসওয়ার্ড পরিবর্তন করুন</button>
+<div id="passwordMsg"></div>
+</div>
+
+<!-- PIN অ্যাক্টিভেশন -->
 <div class="panel">
 <h2>কর্মচারীর PIN সেট / রিসেট</h2>
-<p class="muted">কর্মচারী প্রথমবার PIN সেট করতে না পারলে, অথবা PIN ভুল দিয়ে অ্যাকাউন্ট লক হলে, এখানে নতুন অ্যাক্টিভেশন কোড তৈরি করুন। পুরোনো PIN অ্যাডমিন দেখতে পারবেন না।</p>
-<div class="field">
-<label>কর্মচারী নির্বাচন করুন</label>
-<select id="pinEmployeeSelect"></select>
-</div>
+<p class="muted">নতুন অ্যাক্টিভেশন কোড তৈরি করলে পুরোনো PIN বাতিল হবে।</p>
+<div class="field"><label>কর্মচারী নির্বাচন করুন</label><select id="pinEmployeeSelect"></select></div>
 <button id="issueActivationBtn">নতুন অ্যাক্টিভেশন কোড তৈরি করুন</button>
 <div id="activationResult"></div>
 </div>
 
+<!-- সদস্য অনুমোদন -->
+<div class="panel">
+<h2>সদস্য অনুমোদন ব্যবস্থাপনা</h2>
+<p class="muted">যে কর্মচারীকে অনুমতি দেবেন, তিনি PIN দিয়ে প্রবেশ করে প্রকাশিত তথ্য দেখতে পারবেন।</p>
+<div class="field"><label>কর্মচারী নির্বাচন করুন</label><select id="portalMemberSelect"></select></div>
+<div id="memberStatus" class="status">সদস্যের অবস্থা লোড হচ্ছে...</div>
+<div class="row">
+<button id="enableMemberBtn">সদস্য অনুমতি চালু করুন</button>
+<button id="disableMemberBtn" class="danger">অনুমতি বন্ধ করুন</button>
+</div>
+<div id="memberMsg"></div>
+</div>
+
+<!-- বিভাগ তৈরি -->
+<div class="panel">
+<h2>হোম মেনু / বিভাগ ব্যবস্থাপনা</h2>
+<p class="muted">এখানে নতুন বিভাগ তৈরি করে নোটিশ বা তথ্য সাজাতে পারবেন।</p>
+<div class="field"><label>বিভাগ নির্বাচন করুন</label><select id="sectionSelect"></select></div>
+<div class="field"><label>বিভাগের নাম</label><input id="sectionTitle" placeholder="যেমন: জরুরি নোটিশ"></div>
+<div class="field"><label>ক্রম</label><input id="sectionOrder" type="number" value="0"></div>
+<div class="row">
+<button id="saveSectionBtn">নতুন বিভাগ তৈরি করুন</button>
+<button id="updateSectionBtn" class="secondary">নির্বাচিত বিভাগ আপডেট</button>
+<button id="deleteSectionBtn" class="danger">বিভাগ মুছুন</button>
+</div>
+<div id="sectionMsg"></div>
+</div>
+
+<!-- পোস্ট ব্যবস্থাপনা -->
+<div class="panel">
+<h2>নোটিশ ও তথ্য প্রকাশ</h2>
+<div class="field"><label>তথ্য / নোটিশের শিরোনাম</label><input id="postTitle"></div>
+<div class="field"><label>বিভাগ</label><select id="postSection"></select></div>
+<div class="field"><label>বিস্তারিত লিখুন</label><textarea id="postContent" placeholder="নোটিশ বা প্রয়োজনীয় তথ্য লিখুন..."></textarea></div>
+<div class="field">
+<label><input id="postPublished" type="checkbox" style="width:auto"> এখনই প্রকাশ করুন</label>
+</div>
+<div class="row">
+<button id="savePostBtn">নতুন তথ্য সংরক্ষণ</button>
+<button id="updatePostBtn" class="secondary">নির্বাচিত তথ্য আপডেট</button>
+<button id="deletePostBtn" class="danger">তথ্য মুছুন</button>
+</div>
+<div class="field" style="margin-top:14px">
+<label>আগের প্রকাশিত / সংরক্ষিত তথ্য নির্বাচন করুন</label>
+<select id="postSelect"></select>
+</div>
+<div id="postMsg"></div>
+</div>
+
+<!-- কর্মচারী যোগ -->
 <div class="panel">
 <h2>নতুন কর্মচারী যোগ করুন</h2>
 <div class="grid">
@@ -164,12 +205,10 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div id="empMsg"></div>
 </div>
 
+<!-- কর্মচারী সম্পাদনা -->
 <div class="panel">
 <h2>কর্মচারীর তথ্য সংশোধন</h2>
-<div class="field">
-<label>কর্মচারী নির্বাচন করুন</label>
-<select id="editEmployeeSelect"></select>
-</div>
+<div class="field"><label>কর্মচারী নির্বাচন করুন</label><select id="editEmployeeSelect"></select></div>
 <div class="grid">
 <div class="field"><label>কর্মচারী আইডি</label><input id="editEmpCode"></div>
 <div class="field"><label>নাম</label><input id="editEmpName"></div>
@@ -180,19 +219,18 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div id="editEmpMsg"></div>
 </div>
 
+<!-- ছুটি যোগ -->
 <div class="panel">
 <h2>ছুটির রেকর্ড যোগ করুন</h2>
 <div class="grid">
 <div class="field"><label>কর্মচারী</label><select id="leaveEmployee"></select></div>
-<div class="field">
-<label>ছুটির ধরন</label>
+<div class="field"><label>ছুটির ধরন</label>
 <select id="leaveType">
 <option value="casual">নৈমিত্তিক ছুটি</option>
 <option value="earned">গড় বেতনের অর্জিত ছুটি</option>
 <option value="permission">অনুমতি ছুটি</option>
 <option value="rrl">আরআরএল</option>
-</select>
-</div>
+</select></div>
 <div class="field"><label>দিন সংখ্যা</label><input id="leaveDays" type="number" min="0.5" step="0.5"></div>
 <div class="field"><label>শুরুর তারিখ</label><input id="startDate" type="date"></div>
 <div class="field"><label>শেষের তারিখ</label><input id="endDate" type="date"></div>
@@ -202,23 +240,19 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div id="leaveMsg"></div>
 </div>
 
+<!-- ছুটি সম্পাদনা -->
 <div class="panel">
 <h2>ছুটির রেকর্ড সংশোধন / মুছে ফেলা</h2>
-<div class="field">
-<label>যে রেকর্ডটি পরিবর্তন করবেন</label>
-<select id="editLeaveSelect"></select>
-</div>
+<div class="field"><label>যে রেকর্ডটি পরিবর্তন করবেন</label><select id="editLeaveSelect"></select></div>
 <div class="grid">
 <div class="field"><label>কর্মচারী</label><select id="editLeaveEmployee"></select></div>
-<div class="field">
-<label>ছুটির ধরন</label>
+<div class="field"><label>ছুটির ধরন</label>
 <select id="editLeaveType">
 <option value="casual">নৈমিত্তিক ছুটি</option>
 <option value="earned">গড় বেতনের অর্জিত ছুটি</option>
 <option value="permission">অনুমতি ছুটি</option>
 <option value="rrl">আরআরএল</option>
-</select>
-</div>
+</select></div>
 <div class="field"><label>দিন সংখ্যা</label><input id="editLeaveDays" type="number" min="0.5" step="0.5"></div>
 <div class="field"><label>শুরুর তারিখ</label><input id="editStartDate" type="date"></div>
 <div class="field"><label>শেষের তারিখ</label><input id="editEndDate" type="date"></div>
@@ -231,20 +265,18 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 <div id="editLeaveMsg"></div>
 </div>
 
+<!-- বরাদ্দ -->
 <div class="panel">
 <h2>ছুটির মোট বরাদ্দ পরিবর্তন</h2>
-<p class="muted">এখানে মোট বরাদ্দ বাড়ালে বা কমালে অবশিষ্ট ছুটি স্বয়ংক্রিয়ভাবে নতুন করে হিসাব হবে।</p>
 <div class="grid">
 <div class="field"><label>কর্মচারী</label><select id="entEmployee"></select></div>
-<div class="field">
-<label>ছুটির ধরন</label>
+<div class="field"><label>ছুটির ধরন</label>
 <select id="entType">
 <option value="casual">নৈমিত্তিক ছুটি</option>
 <option value="earned">গড় বেতনের অর্জিত ছুটি</option>
 <option value="permission">অনুমতি ছুটি</option>
 <option value="rrl">আরআরএল</option>
-</select>
-</div>
+</select></div>
 <div class="field"><label>মোট বরাদ্দ (দিন)</label><input id="entTotal" type="number" min="0" step="0.5"></div>
 </div>
 <button id="saveEntitlement">বরাদ্দ সংরক্ষণ</button>
@@ -260,548 +292,421 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 </div>
 </section>
 </main>
-
 <footer>ডিজিটাল ছুটি রেজিস্টার · Supabase ও GitHub Pages</footer>
 
 <script>
 const SUPABASE_URL='https://osalmonlpsemgtxvexos.supabase.co';
 const SUPABASE_KEY='sb_publishable_IaSJLrG3yss91y1tQGQzlw_yPurQ_WO';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let employees=[],leaveRecords=[];
-
+let employees=[],leaveRecords=[],sections=[],posts=[],currentAdmin=null;
 const $=id=>document.getElementById(id);
 
 function msg(id,text,kind='status'){
  $(id).className='status '+kind;
  $(id).textContent=text;
 }
-
-const leaveNames={
- casual:'নৈমিত্তিক ছুটি',
- earned:'গড় বেতনের অর্জিত ছুটি',
- permission:'অনুমতি ছুটি',
- rrl:'আরআরএল'
-};
+function esc(v){
+ return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+const leaveNames={casual:'নৈমিত্তিক ছুটি',earned:'গড় বেতনের অর্জিত ছুটি',permission:'অনুমতি ছুটি',rrl:'আরআরএল'};
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===b));
  ['public','admin'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));
 });
 
-// কর্মচারীর PIN দিয়ে লগইন
+// কর্মচারীর PIN লগইন
 $('lookupBtn').onclick=async()=>{
- const code=$('lookupId').value.trim();
- const pin=$('lookupPin').value.trim();
-
- if(!code){
-  msg('lookupMsg','কর্মচারী আইডি লিখুন।','error');
-  return;
- }
-
- if(!/^[0-9]{4}$/.test(pin)){
-  msg('lookupMsg','সঠিক ৪ সংখ্যার PIN লিখুন।','error');
-  return;
- }
+ const code=$('lookupId').value.trim(),pin=$('lookupPin').value.trim();
+ if(!code){msg('lookupMsg','কর্মচারী আইডি লিখুন।','error');return;}
+ if(!/^[0-9]{4}$/.test(pin)){msg('lookupMsg','সঠিক ৪ সংখ্যার PIN লিখুন।','error');return;}
 
  $('publicResult').innerHTML='';
+ $('portalArea').classList.add('hidden');
  msg('lookupMsg','যাচাই করা হচ্ছে…');
 
- const {data,error}=await sb.rpc(
-  'lookup_employee_leave_with_pin',
-  {
-   p_employee_code:code,
-   p_pin:pin
-  }
- );
-
- if(error){
-  msg('lookupMsg','ডেটাবেসে সমস্যা: '+error.message,'error');
-  return;
- }
-
- if(!data||data.error){
-  msg('lookupMsg',data?.error||'তথ্য পাওয়া যায়নি।','error');
-  return;
- }
-
+ const {data,error}=await sb.rpc('lookup_employee_leave_with_pin',{
+  p_employee_code:code,p_pin:pin
+ });
+ if(error){msg('lookupMsg','ডেটাবেসে সমস্যা: '+error.message,'error');return;}
+ if(!data||data.error){msg('lookupMsg',data?.error||'তথ্য পাওয়া যায়নি।','error');return;}
  if(!data.employee||!Array.isArray(data.balances)||!Array.isArray(data.records)){
-  msg('lookupMsg','তথ্যের ফরম্যাট সঠিক নয়। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।','error');
-  return;
+  msg('lookupMsg','তথ্যের ফরম্যাট সঠিক নয়। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।','error');return;
  }
 
  msg('lookupMsg','তথ্য পাওয়া গেছে।','success');
-
  const e=data.employee;
- let out=`<div class="card">
- <h2>${esc(e.name)}</h2>
- <p>${esc(e.employee_id)} · ${esc(e.designation||'')} · ${esc(e.unit||'')}</p>
- <div class="cards">`;
-
+ let out=`<div class="card"><h2>${esc(e.name)}</h2>
+ <p>${esc(e.employee_id)} · ${esc(e.designation||'')} · ${esc(e.unit||'')}</p><div class="cards">`;
  for(const b of data.balances){
-  out+=`<div class="metric">
-  ${esc(b.type)}
+  out+=`<div class="metric">${esc(leaveNames[b.type]||b.type)}
   <strong>${esc(b.remaining)} দিন</strong>
-  <span class="muted">ব্যবহৃত ${esc(b.used)} / মোট ${esc(b.total)} দিন</span>
-  </div>`;
+  <span class="muted">ব্যবহৃত ${esc(b.used)} / মোট ${esc(b.total)} দিন</span></div>`;
  }
-
  out+='</div></div><div class="panel"><h2>ছুটির রেকর্ড</h2><div class="tablewrap"><table><thead><tr><th>ধরন</th><th>দিন</th><th>শুরু</th><th>শেষ</th><th>মন্তব্য</th></tr></thead><tbody>';
-
  for(const r of data.records){
-  out+=`<tr>
-  <td>${esc(leaveNames[r.leave_type]||r.leave_type)}</td>
-  <td>${esc(r.days)}</td>
-  <td>${esc(r.start_date||'')}</td>
-  <td>${esc(r.end_date||'')}</td>
-  <td>${esc(r.notes||'')}</td>
-  </tr>`;
+  out+=`<tr><td>${esc(leaveNames[r.leave_type]||r.leave_type)}</td>
+  <td>${esc(r.days)}</td><td>${esc(r.start_date||'')}</td>
+  <td>${esc(r.end_date||'')}</td><td>${esc(r.notes||'')}</td></tr>`;
  }
-
  out+='</tbody></table></div></div>';
  $('publicResult').innerHTML=out;
+
+ if(data.portal_access===true){
+  renderPortal(data.portal_sections||[],data.portal_posts||[]);
+ }else{
+  $('portalArea').classList.add('hidden');
+ }
 };
 
-// কর্মচারীর নিজের PIN সেট
-$('setPinBtn').onclick=async()=>{
- const code=$('setupEmployeeId').value.trim();
- const activation=$('activationCode').value.trim();
- const pin=$('newPin').value.trim();
- const confirmPin=$('confirmPin').value.trim();
-
- if(!code||!activation||!pin||!confirmPin){
-  msg('setPinMsg','সব ঘর পূরণ করুন।','error');
-  return;
+function renderPortal(sec,post){
+ $('portalArea').classList.remove('hidden');
+ let menu='<button class="menu-button active" data-section="all">সব তথ্য</button>';
+ for(const s of sec){
+  menu+=`<button class="menu-button" data-section="${esc(s.id)}">${esc(s.title)}</button>`;
  }
+ $('portalMenu').innerHTML=menu;
 
- if(!/^[0-9]{4}$/.test(pin)){
-  msg('setPinMsg','PIN অবশ্যই ৪ সংখ্যার হতে হবে।','error');
-  return;
+ function showPosts(sectionId){
+  const list=sectionId==='all'?post:post.filter(p=>p.section_id===sectionId);
+  if(!list.length){$('portalPosts').innerHTML='<p class="muted">এই বিভাগে এখনো কোনো প্রকাশিত তথ্য নেই।</p>';return;}
+  $('portalPosts').innerHTML=list.map(p=>`<article class="post">
+   <h3>${esc(p.title)}</h3>
+   <div class="muted">${esc(p.section_title||'সাধারণ তথ্য')} · ${esc(p.created_at?new Date(p.created_at).toLocaleDateString('bn-BD'):'')}</div>
+   <div class="post-content">${esc(p.content)}</div></article>`).join('');
  }
-
- if(pin!==confirmPin){
-  msg('setPinMsg','দুইবার দেওয়া PIN এক নয়।','error');
-  return;
- }
-
- msg('setPinMsg','PIN সেট করা হচ্ছে…');
-
- const {data,error}=await sb.rpc(
-  'employee_set_pin',
-  {
-   p_employee_code:code,
-   p_activation_code:activation,
-   p_new_pin:pin
-  }
- );
-
- if(error){
-  msg('setPinMsg','সমস্যা হয়েছে: '+error.message,'error');
-  return;
- }
-
- if(!data||!data.success){
-  msg('setPinMsg',data?.message||'PIN সেট করা যায়নি।','error');
-  return;
- }
-
- msg('setPinMsg','PIN সফলভাবে সেট হয়েছে। এখন Employee ID ও PIN দিয়ে প্রবেশ করতে পারবেন।','success');
-
- $('lookupId').value=code;
- $('lookupPin').value=pin;
- $('setupEmployeeId').value='';
- $('activationCode').value='';
- $('newPin').value='';
- $('confirmPin').value='';
-};
-
-function esc(v){
- return String(v??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
- }[c]));
+ $('portalMenu').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  $('portalMenu').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x===b));
+  showPosts(b.dataset.section);
+ });
+ showPosts('all');
 }
+
+// PIN সেট
+$('setPinBtn').onclick=async()=>{
+ const code=$('setupEmployeeId').value.trim(),activation=$('activationCode').value.trim();
+ const pin=$('newPin').value.trim(),confirmPin=$('confirmPin').value.trim();
+ if(!code||!activation||!pin||!confirmPin){msg('setPinMsg','সব ঘর পূরণ করুন।','error');return;}
+ if(!/^[0-9]{4}$/.test(pin)){msg('setPinMsg','PIN অবশ্যই ৪ সংখ্যার হতে হবে।','error');return;}
+ if(pin!==confirmPin){msg('setPinMsg','দুইবার দেওয়া PIN এক নয়।','error');return;}
+ msg('setPinMsg','PIN সেট করা হচ্ছে…');
+ const {data,error}=await sb.rpc('employee_set_pin',{
+  p_employee_code:code,p_activation_code:activation,p_new_pin:pin
+ });
+ if(error){msg('setPinMsg','সমস্যা হয়েছে: '+error.message,'error');return;}
+ if(!data||!data.success){msg('setPinMsg',data?.message||'PIN সেট করা যায়নি।','error');return;}
+ msg('setPinMsg','PIN সফলভাবে সেট হয়েছে। এখন Employee ID ও PIN দিয়ে প্রবেশ করতে পারবেন।','success');
+ $('lookupId').value=code;$('lookupPin').value=pin;
+ ['setupEmployeeId','activationCode','newPin','confirmPin'].forEach(x=>$(x).value='');
+};
 
 // অ্যাডমিন লগইন
 $('loginBtn').onclick=async()=>{
  const {data,error}=await sb.auth.signInWithPassword({
-  email:$('email').value.trim(),
-  password:$('password').value
+  email:$('email').value.trim(),password:$('password').value
  });
-
- if(error){
-  msg('loginMsg',error.message,'error');
-  return;
- }
-
+ if(error){msg('loginMsg',error.message,'error');return;}
  await showAdmin(data.user);
 };
 
 async function showAdmin(user){
- const {data:admin,error}=await sb.from('admin_users')
-  .select('user_id')
-  .eq('user_id',user.id)
-  .maybeSingle();
-
+ const {data:admin,error}=await sb.from('admin_users').select('user_id').eq('user_id',user.id).maybeSingle();
  if(error||!admin){
-  await sb.auth.signOut();
-  msg('loginMsg','এই অ্যাকাউন্ট অ্যাডমিন হিসেবে অনুমোদিত নয়।','error');
-  return;
+  await sb.auth.signOut();msg('loginMsg','এই অ্যাকাউন্ট অ্যাডমিন হিসেবে অনুমোদিত নয়।','error');return;
  }
-
- $('loginPanel').classList.add('hidden');
- $('adminPanel').classList.remove('hidden');
+ currentAdmin=user;
+ $('loginPanel').classList.add('hidden');$('adminPanel').classList.remove('hidden');
  $('adminEmail').textContent=user.email||'';
-
  await loadEmployees();
+ await loadPortalAdmin();
 }
 
 $('logoutBtn').onclick=async()=>{
- await sb.auth.signOut();
- $('adminPanel').classList.add('hidden');
- $('loginPanel').classList.remove('hidden');
+ await sb.auth.signOut();currentAdmin=null;
+ $('adminPanel').classList.add('hidden');$('loginPanel').classList.remove('hidden');
 };
 
-// কর্মচারীর তালিকা
+// অ্যাডমিন পাসওয়ার্ড পরিবর্তন
+$('changeAdminPassword').onclick=async()=>{
+ const current=$('currentAdminPassword').value;
+ const next=$('newAdminPassword').value;
+ const confirmNew=$('confirmAdminPassword').value;
+ if(!current||!next||!confirmNew){msg('passwordMsg','সব ঘর পূরণ করুন।','error');return;}
+ if(next.length<8){msg('passwordMsg','নতুন পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।','error');return;}
+ if(next!==confirmNew){msg('passwordMsg','নতুন পাসওয়ার্ড দুটি এক নয়।','error');return;}
+ if(next===current){msg('passwordMsg','নতুন পাসওয়ার্ড বর্তমান পাসওয়ার্ডের মতো হতে পারবে না।','error');return;}
+ if(!currentAdmin?.email){msg('passwordMsg','অ্যাডমিন সেশন পাওয়া যায়নি। আবার লগইন করুন।','error');return;}
+
+ msg('passwordMsg','বর্তমান পাসওয়ার্ড যাচাই হচ্ছে…');
+ const {error:verifyError}=await sb.auth.signInWithPassword({
+  email:currentAdmin.email,password:current
+ });
+ if(verifyError){msg('passwordMsg','বর্তমান পাসওয়ার্ড সঠিক নয়।','error');return;}
+
+ const {error}=await sb.auth.updateUser({password:next});
+ if(error){msg('passwordMsg','পাসওয়ার্ড পরিবর্তন হয়নি: '+error.message,'error');return;}
+ msg('passwordMsg','অ্যাডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে।','success');
+ ['currentAdminPassword','newAdminPassword','confirmAdminPassword'].forEach(x=>$(x).value='');
+};
+
+// কর্মচারী তালিকা
 function employeeOptions(){
- return employees.map(e=>
-  `<option value="${e.id}">${esc(e.employee_id)} — ${esc(e.name)}</option>`
- ).join('');
+ return employees.map(e=>`<option value="${e.id}">${esc(e.employee_id)} — ${esc(e.name)}</option>`).join('');
 }
 
 async function loadEmployees(){
- const {data,error}=await sb.from('employees')
-  .select('id,employee_id,name,designation,unit')
-  .order('name');
-
- if(error){
-  msg('empMsg',error.message,'error');
-  return;
- }
-
+ const {data,error}=await sb.from('employees').select('id,employee_id,name,designation,unit').order('name');
+ if(error){msg('empMsg',error.message,'error');return;}
  employees=data||[];
-
- [
-  'leaveEmployee',
-  'editEmployeeSelect',
-  'editLeaveEmployee',
-  'entEmployee',
-  'pinEmployeeSelect'
- ].forEach(id=>{
+ ['leaveEmployee','editEmployeeSelect','editLeaveEmployee','entEmployee','pinEmployeeSelect','portalMemberSelect'].forEach(id=>{
   $(id).innerHTML=employeeOptions();
  });
-
- $('employeesTable').innerHTML=
-  '<table><thead><tr><th>আইডি</th><th>নাম</th><th>পদবি</th><th>ইউনিট</th></tr></thead><tbody>'+
-  employees.map(e=>`<tr>
-   <td>${esc(e.employee_id)}</td>
-   <td>${esc(e.name)}</td>
-   <td>${esc(e.designation)}</td>
-   <td>${esc(e.unit)}</td>
-  </tr>`).join('')+
-  '</tbody></table>';
-
+ $('employeesTable').innerHTML='<table><thead><tr><th>আইডি</th><th>নাম</th><th>পদবি</th><th>ইউনিট</th></tr></thead><tbody>'+
+ employees.map(e=>`<tr><td>${esc(e.employee_id)}</td><td>${esc(e.name)}</td><td>${esc(e.designation)}</td><td>${esc(e.unit)}</td></tr>`).join('')+'</tbody></table>';
  loadEmployeeEditFields();
  await loadLeaveRecords();
  await loadEntitlement();
+ await loadMemberStatus();
 }
 
-// অ্যাডমিন নতুন অ্যাক্টিভেশন কোড তৈরি
+// PIN অ্যাক্টিভেশন
 $('issueActivationBtn').onclick=async()=>{
- const employeeId=$('pinEmployeeSelect').value;
- const employee=employees.find(e=>e.id===employeeId);
-
- if(!employee){
-  msg('activationResult','প্রথমে একজন কর্মচারী নির্বাচন করুন।','error');
-  return;
- }
-
- if(!confirm(employee.name+' - '+employee.employee_id+' এর জন্য নতুন অ্যাক্টিভেশন কোড তৈরি করবেন? পুরোনো PIN বাতিল হবে।')){
-  return;
- }
-
+ const employee=employees.find(e=>e.id===$('pinEmployeeSelect').value);
+ if(!employee){msg('activationResult','প্রথমে একজন কর্মচারী নির্বাচন করুন।','error');return;}
+ if(!confirm(employee.name+' - '+employee.employee_id+' এর জন্য নতুন অ্যাক্টিভেশন কোড তৈরি করবেন? পুরোনো PIN বাতিল হবে।'))return;
  msg('activationResult','অ্যাক্টিভেশন কোড তৈরি হচ্ছে…');
-
- const {data,error}=await sb.rpc(
-  'admin_issue_employee_activation',
-  {
-   p_employee_code:employee.employee_id
-  }
- );
-
- if(error){
-  msg('activationResult','কোড তৈরি হয়নি: '+error.message,'error');
-  return;
- }
-
- $('activationResult').innerHTML=
-  '<div class="status success">'+
-  '<strong>নতুন অ্যাক্টিভেশন কোড:</strong><br>'+
-  '<span style="font-size:22px;font-weight:bold;letter-spacing:2px">'+esc(data)+'</span>'+
-  '<p>কোডটি কর্মচারীকে ব্যক্তিগতভাবে দিন। এটি ২৪ ঘণ্টা পর্যন্ত কার্যকর এবং একবার ব্যবহার করা যাবে।</p>'+
-  '<button type="button" id="copyActivationBtn">কোড কপি করুন</button>'+
-  '</div>';
-
+ const {data,error}=await sb.rpc('admin_issue_employee_activation',{p_employee_code:employee.employee_id});
+ if(error){msg('activationResult','কোড তৈরি হয়নি: '+error.message,'error');return;}
+ $('activationResult').innerHTML='<div class="status success"><strong>নতুন অ্যাক্টিভেশন কোড:</strong><br><span id="activationCodeText" style="font-size:22px;font-weight:bold;letter-spacing:2px"></span><p>কোডটি কর্মচারীকে ব্যক্তিগতভাবে দিন। এটি ২৪ ঘণ্টা কার্যকর এবং একবার ব্যবহার করা যাবে।</p><button type="button" id="copyActivationBtn">কোড কপি করুন</button></div>';
+ $('activationCodeText').textContent=String(data);
  $('copyActivationBtn').onclick=async()=>{
-  try{
-   await navigator.clipboard.writeText(String(data));
-   alert('অ্যাক্টিভেশন কোড কপি হয়েছে।');
-  }catch(e){
-   alert('কপি করা যায়নি। কোডটি হাতে লিখে কর্মচারীকে দিন।');
-  }
+  try{await navigator.clipboard.writeText(String(data));alert('অ্যাক্টিভেশন কোড কপি হয়েছে।');}
+  catch(e){alert('কপি করা যায়নি। কোডটি হাতে লিখে কর্মচারীকে দিন।');}
  };
 };
 
+// সদস্য অনুমোদন
+async function loadMemberStatus(){
+ const id=$('portalMemberSelect').value;
+ const emp=employees.find(e=>e.id===id);
+ if(!emp)return;
+ const {data,error}=await sb.from('portal_members').select('is_enabled').eq('employee_id',id).maybeSingle();
+ if(error){msg('memberStatus','তথ্য আনা যায়নি: '+error.message,'error');return;}
+ const enabled=!!data?.is_enabled;
+ $('memberStatus').textContent=emp.employee_id+' — '+emp.name+' : '+(enabled?'অনুমতি চালু আছে':'অনুমতি বন্ধ আছে');
+ $('memberStatus').className='status '+(enabled?'success':'');
+}
+$('portalMemberSelect').onchange=loadMemberStatus;
+
+async function setMemberAccess(enabled){
+ const id=$('portalMemberSelect').value;
+ const emp=employees.find(e=>e.id===id);
+ if(!emp){msg('memberMsg','কর্মচারী নির্বাচন করুন।','error');return;}
+ const {data,error}=await sb.rpc('admin_set_portal_member',{
+  p_employee_code:emp.employee_id,p_enabled:enabled
+ });
+ if(error){msg('memberMsg','অনুমতি পরিবর্তন হয়নি: '+error.message,'error');return;}
+ msg('memberMsg',data?.message||'অনুমতি পরিবর্তন হয়েছে।','success');
+ await loadMemberStatus();
+}
+$('enableMemberBtn').onclick=()=>setMemberAccess(true);
+$('disableMemberBtn').onclick=()=>setMemberAccess(false);
+
+// বিভাগ ব্যবস্থাপনা
+async function loadPortalAdmin(){
+ const {data:sd,error:se}=await sb.from('portal_sections').select('*').order('sort_order');
+ if(se){msg('sectionMsg','বিভাগ আনা যায়নি: '+se.message,'error');return;}
+ sections=sd||[];
+ const options=sections.map(s=>`<option value="${s.id}">${esc(s.title)}${s.is_active?'':' (বন্ধ)'}</option>`).join('');
+ $('sectionSelect').innerHTML=options;
+ $('postSection').innerHTML='<option value="">সাধারণ / কোনো বিভাগ নয়</option>'+options;
+ if(sections.length)loadSectionFields();
+ await loadPosts();
+}
+function loadSectionFields(){
+ const s=sections.find(x=>x.id===$('sectionSelect').value)||sections[0];
+ if(!s)return;
+ $('sectionSelect').value=s.id;$('sectionTitle').value=s.title;$('sectionOrder').value=s.sort_order;
+}
+$('sectionSelect').onchange=loadSectionFields;
+
+$('saveSectionBtn').onclick=async()=>{
+ const title=$('sectionTitle').value.trim();
+ if(!title){msg('sectionMsg','বিভাগের নাম লিখুন।','error');return;}
+ const {error}=await sb.from('portal_sections').insert({
+  title,slug:'section-'+Date.now(),sort_order:Number($('sectionOrder').value)||0,is_active:true
+ });
+ if(error){msg('sectionMsg','বিভাগ তৈরি হয়নি: '+error.message,'error');return;}
+ msg('sectionMsg','নতুন বিভাগ তৈরি হয়েছে।','success');
+ $('sectionTitle').value='';await loadPortalAdmin();
+};
+$('updateSectionBtn').onclick=async()=>{
+ const id=$('sectionSelect').value,title=$('sectionTitle').value.trim();
+ if(!id||!title){msg('sectionMsg','বিভাগ নির্বাচন করে নাম লিখুন।','error');return;}
+ const {error}=await sb.from('portal_sections').update({title,sort_order:Number($('sectionOrder').value)||0}).eq('id',id);
+ if(error){msg('sectionMsg','আপডেট হয়নি: '+error.message,'error');return;}
+ msg('sectionMsg','বিভাগ আপডেট হয়েছে।','success');await loadPortalAdmin();
+};
+$('deleteSectionBtn').onclick=async()=>{
+ const id=$('sectionSelect').value;
+ if(!id){msg('sectionMsg','বিভাগ নির্বাচন করুন।','error');return;}
+ if(!confirm('বিভাগটি মুছবেন? এর অধীনে থাকা তথ্য সাধারণ বিভাগে চলে যাবে।'))return;
+ const {error}=await sb.from('portal_sections').delete().eq('id',id);
+ if(error){msg('sectionMsg','বিভাগ মোছা যায়নি: '+error.message,'error');return;}
+ msg('sectionMsg','বিভাগ মুছে ফেলা হয়েছে।','success');await loadPortalAdmin();
+};
+
+// পোস্ট ব্যবস্থাপনা
+async function loadPosts(){
+ const {data,error}=await sb.from('portal_posts').select('*').order('created_at',{ascending:false});
+ if(error){msg('postMsg','তথ্য আনা যায়নি: '+error.message,'error');return;}
+ posts=data||[];
+ $('postSelect').innerHTML=posts.map(p=>`<option value="${p.id}">${esc(p.title)} — ${p.is_published?'প্রকাশিত':'অপ্রকাশিত'}</option>`).join('');
+ if(posts.length)loadPostFields();
+ else clearPostFields();
+}
+function clearPostFields(){
+ $('postTitle').value='';$('postContent').value='';$('postPublished').checked=false;
+}
+function loadPostFields(){
+ const p=posts.find(x=>x.id===$('postSelect').value)||posts[0];
+ if(!p)return;
+ $('postSelect').value=p.id;$('postTitle').value=p.title;
+ $('postContent').value=p.content;$('postSection').value=p.section_id||'';
+ $('postPublished').checked=!!p.is_published;
+}
+$('postSelect').onchange=loadPostFields;
+
+function postData(){
+ return {
+  title:$('postTitle').value.trim(),
+  content:$('postContent').value.trim(),
+  section_id:$('postSection').value||null,
+  is_published:$('postPublished').checked,
+  updated_at:new Date().toISOString()
+ };
+}
+$('savePostBtn').onclick=async()=>{
+ const row=postData();
+ if(!row.title||!row.content){msg('postMsg','শিরোনাম ও বিস্তারিত লিখুন।','error');return;}
+ const {error}=await sb.from('portal_posts').insert(row);
+ if(error){msg('postMsg','তথ্য সংরক্ষণ হয়নি: '+error.message,'error');return;}
+ msg('postMsg','নতুন তথ্য সংরক্ষিত হয়েছে।','success');clearPostFields();await loadPosts();
+};
+$('updatePostBtn').onclick=async()=>{
+ const id=$('postSelect').value,row=postData();
+ if(!id){msg('postMsg','আগের তথ্য নির্বাচন করুন।','error');return;}
+ if(!row.title||!row.content){msg('postMsg','শিরোনাম ও বিস্তারিত লিখুন।','error');return;}
+ const {error}=await sb.from('portal_posts').update(row).eq('id',id);
+ if(error){msg('postMsg','তথ্য আপডেট হয়নি: '+error.message,'error');return;}
+ msg('postMsg','তথ্য আপডেট হয়েছে।','success');await loadPosts();
+};
+$('deletePostBtn').onclick=async()=>{
+ const id=$('postSelect').value;
+ if(!id){msg('postMsg','তথ্য নির্বাচন করুন।','error');return;}
+ if(!confirm('এই তথ্যটি স্থায়ীভাবে মুছে ফেলবেন?'))return;
+ const {error}=await sb.from('portal_posts').delete().eq('id',id);
+ if(error){msg('postMsg','তথ্য মোছা যায়নি: '+error.message,'error');return;}
+ msg('postMsg','তথ্য মুছে ফেলা হয়েছে।','success');clearPostFields();await loadPosts();
+};
+
+// কর্মচারী সম্পাদনা
 function loadEmployeeEditFields(){
  const e=employees.find(x=>x.id===$('editEmployeeSelect').value)||employees[0];
  if(!e)return;
-
- $('editEmployeeSelect').value=e.id;
- $('editEmpCode').value=e.employee_id||'';
- $('editEmpName').value=e.name||'';
- $('editEmpDesignation').value=e.designation||'';
+ $('editEmployeeSelect').value=e.id;$('editEmpCode').value=e.employee_id||'';
+ $('editEmpName').value=e.name||'';$('editEmpDesignation').value=e.designation||'';
  $('editEmpUnit').value=e.unit||'';
 }
-
 $('editEmployeeSelect').onchange=loadEmployeeEditFields;
-
 $('saveEmployeeEdit').onclick=async()=>{
  const id=$('editEmployeeSelect').value;
-
- const row={
-  employee_id:$('editEmpCode').value.trim(),
-  name:$('editEmpName').value.trim(),
-  designation:$('editEmpDesignation').value.trim(),
-  unit:$('editEmpUnit').value.trim()
- };
-
- if(!id||!row.employee_id||!row.name){
-  msg('editEmpMsg','কর্মচারী আইডি ও নাম অবশ্যই দিতে হবে।','error');
-  return;
- }
-
+ const row={employee_id:$('editEmpCode').value.trim(),name:$('editEmpName').value.trim(),designation:$('editEmpDesignation').value.trim(),unit:$('editEmpUnit').value.trim()};
+ if(!id||!row.employee_id||!row.name){msg('editEmpMsg','কর্মচারী আইডি ও নাম অবশ্যই দিতে হবে।','error');return;}
  const {error}=await sb.from('employees').update(row).eq('id',id);
-
- if(error){
-  msg('editEmpMsg','আপডেট হয়নি: '+error.message,'error');
-  return;
- }
-
- msg('editEmpMsg','কর্মচারীর তথ্য সফলভাবে পরিবর্তন হয়েছে।','success');
- await loadEmployees();
+ if(error){msg('editEmpMsg','আপডেট হয়নি: '+error.message,'error');return;}
+ msg('editEmpMsg','কর্মচারীর তথ্য সফলভাবে পরিবর্তন হয়েছে।','success');await loadEmployees();
 };
 
 $('addEmployee').onclick=async()=>{
- const row={
-  employee_id:$('empCode').value.trim(),
-  name:$('empName').value.trim(),
-  designation:$('empDesignation').value.trim(),
-  unit:$('empUnit').value.trim()
- };
-
- if(!row.employee_id||!row.name){
-  msg('empMsg','কর্মচারী আইডি ও নাম আবশ্যক।','error');
-  return;
- }
-
+ const row={employee_id:$('empCode').value.trim(),name:$('empName').value.trim(),designation:$('empDesignation').value.trim(),unit:$('empUnit').value.trim()};
+ if(!row.employee_id||!row.name){msg('empMsg','কর্মচারী আইডি ও নাম আবশ্যক।','error');return;}
  const {error}=await sb.from('employees').insert(row);
-
- if(error){
-  msg('empMsg',error.message,'error');
-  return;
- }
-
+ if(error){msg('empMsg',error.message,'error');return;}
  msg('empMsg','কর্মচারী সংরক্ষিত হয়েছে।','success');
-
  ['empCode','empName','empDesignation','empUnit'].forEach(x=>$(x).value='');
-
  await loadEmployees();
 };
 
+// ছুটি যোগ
 $('addLeave').onclick=async()=>{
- const emp=$('leaveEmployee').value;
- const days=Number($('leaveDays').value);
- const start=$('startDate').value;
- const end=$('endDate').value;
-
- if(!emp||!days||!start||!end){
-  msg('leaveMsg','কর্মচারী, দিন সংখ্যা ও তারিখ পূরণ করুন।','error');
-  return;
- }
-
- if(end<start){
-  msg('leaveMsg','শেষের তারিখ শুরুর তারিখের আগে হতে পারে না।','error');
-  return;
- }
-
+ const emp=$('leaveEmployee').value,days=Number($('leaveDays').value);
+ const start=$('startDate').value,end=$('endDate').value;
+ if(!emp||!days||!start||!end){msg('leaveMsg','কর্মচারী, দিন সংখ্যা ও তারিখ পূরণ করুন।','error');return;}
+ if(end<start){msg('leaveMsg','শেষের তারিখ শুরুর তারিখের আগে হতে পারে না।','error');return;}
  const {error}=await sb.from('leave_records').insert({
-  employee_id:emp,
-  leave_type:$('leaveType').value,
-  days,
-  start_date:start,
-  end_date:end,
-  notes:$('leaveNotes').value.trim()
+  employee_id:emp,leave_type:$('leaveType').value,days,start_date:start,end_date:end,notes:$('leaveNotes').value.trim()
  });
-
- if(error){
-  msg('leaveMsg',error.message,'error');
-  return;
- }
-
+ if(error){msg('leaveMsg',error.message,'error');return;}
  msg('leaveMsg','ছুটির রেকর্ড সংরক্ষিত হয়েছে।','success');
- $('leaveDays').value='';
- $('leaveNotes').value='';
- await loadLeaveRecords();
+ $('leaveDays').value='';$('leaveNotes').value='';await loadLeaveRecords();
 };
 
 async function loadLeaveRecords(){
- const {data,error}=await sb.from('leave_records')
-  .select('id,employee_id,leave_type,days,start_date,end_date,notes')
-  .order('start_date',{ascending:false});
-
- if(error){
-  msg('editLeaveMsg','ছুটির তালিকা আনা যায়নি: '+error.message,'error');
-  return;
- }
-
+ const {data,error}=await sb.from('leave_records').select('id,employee_id,leave_type,days,start_date,end_date,notes').order('start_date',{ascending:false});
+ if(error){msg('editLeaveMsg','ছুটির তালিকা আনা যায়নি: '+error.message,'error');return;}
  leaveRecords=data||[];
-
  $('editLeaveSelect').innerHTML=leaveRecords.map(r=>{
   const e=employees.find(x=>x.id===r.employee_id);
-
-  return `<option value="${r.id}">
-   ${esc(e?.employee_id||'আইডি নেই')} -
-   ${esc(e?.name||'নাম নেই')} |
-   ${esc(leaveNames[r.leave_type]||r.leave_type)} |
-   ${esc(r.start_date||'')}
-  </option>`;
+  return `<option value="${r.id}">${esc(e?.employee_id||'আইডি নেই')} - ${esc(e?.name||'নাম নেই')} | ${esc(leaveNames[r.leave_type]||r.leave_type)} | ${esc(r.start_date||'')}</option>`;
  }).join('');
-
  loadLeaveEditFields();
 }
-
 function loadLeaveEditFields(){
  const r=leaveRecords.find(x=>x.id===$('editLeaveSelect').value)||leaveRecords[0];
  if(!r)return;
-
- $('editLeaveSelect').value=r.id;
- $('editLeaveEmployee').value=r.employee_id;
- $('editLeaveType').value=r.leave_type;
- $('editLeaveDays').value=r.days;
- $('editStartDate').value=r.start_date||'';
- $('editEndDate').value=r.end_date||'';
+ $('editLeaveSelect').value=r.id;$('editLeaveEmployee').value=r.employee_id;
+ $('editLeaveType').value=r.leave_type;$('editLeaveDays').value=r.days;
+ $('editStartDate').value=r.start_date||'';$('editEndDate').value=r.end_date||'';
  $('editLeaveNotes').value=r.notes||'';
 }
-
 $('editLeaveSelect').onchange=loadLeaveEditFields;
 
 $('saveLeaveEdit').onclick=async()=>{
- const id=$('editLeaveSelect').value;
- const days=Number($('editLeaveDays').value);
- const start=$('editStartDate').value;
- const end=$('editEndDate').value;
-
- if(!id||!days||!start||!end){
-  msg('editLeaveMsg','সব প্রয়োজনীয় ঘর পূরণ করুন।','error');
-  return;
- }
-
- if(end<start){
-  msg('editLeaveMsg','শেষের তারিখ শুরুর তারিখের আগে হতে পারে না।','error');
-  return;
- }
-
- const row={
-  employee_id:$('editLeaveEmployee').value,
-  leave_type:$('editLeaveType').value,
-  days,
-  start_date:start,
-  end_date:end,
-  notes:$('editLeaveNotes').value.trim()
- };
-
+ const id=$('editLeaveSelect').value,days=Number($('editLeaveDays').value);
+ const start=$('editStartDate').value,end=$('editEndDate').value;
+ if(!id||!days||!start||!end){msg('editLeaveMsg','সব প্রয়োজনীয় ঘর পূরণ করুন।','error');return;}
+ if(end<start){msg('editLeaveMsg','শেষের তারিখ শুরুর তারিখের আগে হতে পারে না।','error');return;}
+ const row={employee_id:$('editLeaveEmployee').value,leave_type:$('editLeaveType').value,days,start_date:start,end_date:end,notes:$('editLeaveNotes').value.trim()};
  const {error}=await sb.from('leave_records').update(row).eq('id',id);
-
- if(error){
-  msg('editLeaveMsg','পরিবর্তন হয়নি: '+error.message,'error');
-  return;
- }
-
- msg('editLeaveMsg','ছুটির রেকর্ড সফলভাবে পরিবর্তন হয়েছে।','success');
- await loadLeaveRecords();
+ if(error){msg('editLeaveMsg','পরিবর্তন হয়নি: '+error.message,'error');return;}
+ msg('editLeaveMsg','ছুটির রেকর্ড সফলভাবে পরিবর্তন হয়েছে।','success');await loadLeaveRecords();
 };
-
 $('deleteLeave').onclick=async()=>{
  const id=$('editLeaveSelect').value;
-
- if(!id){
-  msg('editLeaveMsg','মুছতে কোনো রেকর্ড নির্বাচন করুন।','error');
-  return;
- }
-
+ if(!id){msg('editLeaveMsg','মুছতে কোনো রেকর্ড নির্বাচন করুন।','error');return;}
  if(!confirm('আপনি কি নিশ্চিতভাবে এই ছুটির রেকর্ড মুছতে চান?'))return;
-
  const {error}=await sb.from('leave_records').delete().eq('id',id);
-
- if(error){
-  msg('editLeaveMsg','রেকর্ড মোছা যায়নি: '+error.message,'error');
-  return;
- }
-
- msg('editLeaveMsg','ছুটির রেকর্ড মুছে ফেলা হয়েছে।','success');
- await loadLeaveRecords();
+ if(error){msg('editLeaveMsg','রেকর্ড মোছা যায়নি: '+error.message,'error');return;}
+ msg('editLeaveMsg','ছুটির রেকর্ড মুছে ফেলা হয়েছে।','success');await loadLeaveRecords();
 };
 
+// ছুটির বরাদ্দ
 async function loadEntitlement(){
- const emp=$('entEmployee').value;
- const typ=$('entType').value;
+ const emp=$('entEmployee').value,typ=$('entType').value;
  if(!emp)return;
-
- const {data,error}=await sb.from('employee_leave_entitlements')
-  .select('total_days')
-  .eq('employee_id',emp)
-  .eq('leave_type',typ)
-  .maybeSingle();
-
- if(error){
-  msg('entMsg','বরাদ্দের তথ্য আনা যায়নি: '+error.message,'error');
-  return;
- }
-
+ const {data,error}=await sb.from('employee_leave_entitlements').select('total_days').eq('employee_id',emp).eq('leave_type',typ).maybeSingle();
+ if(error){msg('entMsg','বরাদ্দের তথ্য আনা যায়নি: '+error.message,'error');return;}
  $('entTotal').value=data?data.total_days:'';
 }
-
 $('entEmployee').onchange=loadEntitlement;
 $('entType').onchange=loadEntitlement;
-
 $('saveEntitlement').onclick=async()=>{
- const employee_id=$('entEmployee').value;
- const leave_type=$('entType').value;
- const total_days=Number($('entTotal').value);
-
- if(!employee_id||$('entTotal').value===''||!Number.isFinite(total_days)||total_days<0){
-  msg('entMsg','সঠিক মোট বরাদ্দ লিখুন (শূন্য বা তার বেশি)।','error');
-  return;
- }
-
- const {error}=await sb.from('employee_leave_entitlements').upsert(
-  {
-   employee_id,
-   leave_type,
-   total_days,
-   updated_at:new Date().toISOString()
-  },
-  {onConflict:'employee_id,leave_type'}
- );
-
- if(error){
-  msg('entMsg','বরাদ্দ পরিবর্তন হয়নি: '+error.message,'error');
-  return;
- }
-
+ const employee_id=$('entEmployee').value,leave_type=$('entType').value,total_days=Number($('entTotal').value);
+ if(!employee_id||$('entTotal').value===''||!Number.isFinite(total_days)||total_days<0){msg('entMsg','সঠিক মোট বরাদ্দ লিখুন।','error');return;}
+ const {error}=await sb.from('employee_leave_entitlements').upsert({employee_id,leave_type,total_days,updated_at:new Date().toISOString()},{onConflict:'employee_id,leave_type'});
+ if(error){msg('entMsg','বরাদ্দ পরিবর্তন হয়নি: '+error.message,'error');return;}
  msg('entMsg','ছুটির মোট বরাদ্দ সফলভাবে পরিবর্তন হয়েছে।','success');
 };
 
