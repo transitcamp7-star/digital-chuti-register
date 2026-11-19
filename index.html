@@ -586,7 +586,7 @@ document.addEventListener('click',e=>{
 async function loadSiteSettings(){
  const {data,error}=await sb
   .from('site_settings')
-  .select('site_name')
+ .select('site_name, logo_url')
   .eq('id',true)
   .maybeSingle();
 
@@ -599,6 +599,12 @@ async function loadSiteSettings(){
   $('siteName').textContent=data.site_name;
   $('newSiteName').value=data.site_name;
  }
+   if(data.logo_url){
+   $('siteLogo').src=data.logo_url;
+   $('siteLogo').style.display='block';
+  }else{
+   $('siteLogo').style.display='none';
+  }
 }
 
 $('saveSiteName').onclick=async()=>{
