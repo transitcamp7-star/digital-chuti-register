@@ -406,7 +406,27 @@ document.querySelectorAll('[data-menu]').forEach(btn=>{
  };
 });
 
-// অ্যাডমিনের বিভিন্ন কাজের মেনু
+// হোম / ড্যাশবোর্ড মেনু
+document.querySelectorAll('[data-home]').forEach(btn=>{
+ btn.onclick=()=>{
+  $('menuDropdown').classList.remove('show');
+
+  const panels=[
+   'passwordPanel','pinPanel','memberPanel','sectionPanel',
+   'postPanel','employeePanel','editEmployeePanel',
+   'leavePanel','editLeavePanel','entitlementPanel','employeesPanel'
+  ];
+
+  panels.forEach(id=>{
+   $(id).style.display='none';
+  });
+
+  $('adminPanel').style.display='block';
+  $('loginPanel').style.display='none';
+
+  $('adminPanel').scrollIntoView({behavior:'smooth'});
+ };
+});// অ্যাডমিনের বিভিন্ন কাজের মেনু
 document.querySelectorAll('[data-scroll]').forEach(btn=>{
  btn.onclick=()=>{
   const target=$(btn.dataset.scroll);
