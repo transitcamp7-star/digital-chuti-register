@@ -527,8 +527,8 @@ document.querySelectorAll('[data-scroll]').forEach(btn=>{
   if(target){
    target.style.display='block';
    target.scrollIntoView({behavior:'smooth',block:'start'});
-  }
  };
+});
  // ছবি আপলোড
 $('uploadImageBtn').onclick=async()=>{
  const file=$('imageFile').files[0];
