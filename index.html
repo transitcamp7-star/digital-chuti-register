@@ -108,7 +108,8 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 #leavePanel,
 #editLeavePanel,
 #entitlementPanel,
-#employeesPanel{
+#employeesPanel
+ #imagePanel,{
  display:none;
 }
 .tabs{
@@ -496,7 +497,7 @@ document.querySelectorAll('[data-scroll]').forEach(btn=>{
   const panels=[
    'passwordPanel','pinPanel','memberPanel','sectionPanel',
    'postPanel','employeePanel','editEmployeePanel',
-   'leavePanel','editLeavePanel','entitlementPanel','employeesPanel'
+   'leavePanel','editLeavePanel','entitlementPanel','employeesPanel','imagePanel'
   ];
 
   panels.forEach(id=>{
