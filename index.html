@@ -123,6 +123,8 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 
 <header>
 <div id="siteBrand" style="text-align:center;">
+ <img id="siteBanner" src="" alt="ওয়েবসাইট ব্যানার"
+     style="display:none;width:100%;max-height:180px;object-fit:cover;margin-bottom:12px;border-radius:10px;">
   <img id="siteLogo" src="" alt="ওয়েবসাইট লোগো"
        style="display:none;max-width:110px;max-height:90px;object-fit:contain;margin:0 auto 10px;">
   <h1 id="siteName">ডিজিটাল ছুটি রেজিস্টার</h1>
@@ -573,6 +575,55 @@ $('uploadImageBtn').onclick=async()=>{
  const {data:publicData}=sb.storage
   .from('website-images')
   .getPublicUrl(data.path);
+const {data:publicData}=sb.storage
+  .from('website-images')
+  .getPublicUrl(data.path);
+
+ if(type==='logo' || type==='banner'){
+ const column=type==='logo'?'logo_url':'banner_url';
+
+ const {error:saveError}=await sb
+  .from('site_settings')
+  .update({
+   [column]:publicData.publicUrl,
+   updated_at:new Date().toISOString()
+  })
+  .eq('id',true);
+
+ if(saveError){
+  msg('imageMsg','ছবি আপলোড হয়েছে, কিন্তু লিংক সংরক্ষণ হয়নি: '+saveError.message,'error');
+  return;
+ }
+
+ if(type==='logo'){
+  $('siteLogo').src=publicData.publicUrl;
+  $('siteLogo').style.display='block';
+ }
+
+ if(type==='banner'){
+  $('siteBanner').src=publicData.publicUrl;
+  $('siteBanner').style.display='block';
+ }
+}msg('imageMsg','ছবি সফলভাবে আপলোড হয়েছে। লিংক: '+publicData.publicUrl,'success');
+};
+// বাইরে ক্লিক করলে মেনু বন্ধ হবে
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.menu-area')){
+  $('menuDropdown').classList.remove('show');
+ }
+});
+ // ওয়েবসাইটের নাম লোড ও সংরক্ষণ
+async function loadSiteSettings(){
+ const {data,error}=await sb
+  .from('site_settings')
+ .select('site_name, logo_url, banner_url')
+  .eq('id',true)
+  .maybeSingle();
+
+ if(error){
+  console.error('সেটিংস লোড হয়নি:',error.message);
+  return;
+ }
 
  msg('imageMsg','ছবি সফলভাবে আপলোড হয়েছে। লিংক: '+publicData.publicUrl,'success');
 };
@@ -586,7 +637,7 @@ document.addEventListener('click',e=>{
 async function loadSiteSettings(){
  const {data,error}=await sb
   .from('site_settings')
- .select('site_name, logo_url')
+ .select('site_name, logo_url, banner_url')
   .eq('id',true)
   .maybeSingle();
 
@@ -605,6 +656,12 @@ async function loadSiteSettings(){
   }else{
    $('siteLogo').style.display='none';
   }
+ if(data.banner_url){
+ $('siteBanner').src=data.banner_url;
+ $('siteBanner').style.display='block';
+}else{
+ $('siteBanner').style.display='none';
+}
 }
 
 $('saveSiteName').onclick=async()=>{
