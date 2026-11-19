@@ -718,6 +718,44 @@ $('saveSiteName').onclick=async()=>{
 };
 
 loadSiteSettings();
+ // অ্যাডমিন পাসওয়ার্ড পরিবর্তন
+$('changeAdminPassword').onclick=async()=>{
+ if(!currentAdmin){
+  msg('passwordChangeMsg','প্রথমে অ্যাডমিন লগইন করুন।','error');
+  return;
+ }
+
+ const newPassword=$('newAdminPassword').value;
+ const confirmPassword=$('confirmAdminPassword').value;
+
+ if(newPassword.length<6){
+  msg('passwordChangeMsg','পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।','error');
+  return;
+ }
+
+ if(newPassword!==confirmPassword){
+  msg('passwordChangeMsg','দুটি পাসওয়ার্ড মিলছে না।','error');
+  return;
+ }
+
+ $('changeAdminPassword').disabled=true;
+
+ const {error}=await sb.auth.updateUser({
+  password:newPassword
+ });
+
+ $('changeAdminPassword').disabled=false;
+
+ if(error){
+  msg('passwordChangeMsg','পাসওয়ার্ড পরিবর্তন হয়নি: '+error.message,'error');
+  return;
+ }
+
+ $('newAdminPassword').value='';
+ $('confirmAdminPassword').value='';
+
+ msg('passwordChangeMsg','অ্যাডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন হয়েছে।','success');
+};
 function msg(id,text,kind='status'){
  $(id).className='status '+kind;
  $(id).textContent=text;
