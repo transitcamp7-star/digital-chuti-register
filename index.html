@@ -580,7 +580,60 @@ document.addEventListener('click',e=>{
  if(!e.target.closest('.menu-area')){
   $('menuDropdown').classList.remove('show');
  }
-});
+});// ওয়েবসাইটের নাম লোড ও সংরক্ষণ
+async function loadSiteSettings(){
+ const {data,error}=await sb
+  .from('site_settings')
+  .select('site_name')
+  .eq('id',true)
+  .maybeSingle();
+
+ if(error){
+  console.error('সেটিংস লোড হয়নি:',error.message);
+  return;
+ }
+
+ if(data){
+  $('siteName').textContent=data.site_name;
+  $('newSiteName').value=data.site_name;
+ }
+}
+
+$('saveSiteName').onclick=async()=>{
+ if(!currentAdmin){
+  msg('settingsMsg','প্রথমে অ্যাডমিন লগইন করুন।','error');
+  return;
+ }
+
+ const siteName=$('newSiteName').value.trim();
+
+ if(!siteName){
+  msg('settingsMsg','ওয়েবসাইটের নাম লিখুন।','error');
+  return;
+ }
+
+ $('saveSiteName').disabled=true;
+
+ const {error}=await sb
+  .from('site_settings')
+  .update({
+   site_name:siteName,
+   updated_at:new Date().toISOString()
+  })
+  .eq('id',true);
+
+ $('saveSiteName').disabled=false;
+
+ if(error){
+  msg('settingsMsg','নাম সংরক্ষণ হয়নি: '+error.message,'error');
+  return;
+ }
+
+ $('siteName').textContent=siteName;
+ msg('settingsMsg','ওয়েবসাইটের নাম সফলভাবে পরিবর্তন হয়েছে।','success');
+};
+
+loadSiteSettings();
 function msg(id,text,kind='status'){
  $(id).className='status '+kind;
  $(id).textContent=text;
