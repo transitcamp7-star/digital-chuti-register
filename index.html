@@ -555,7 +555,7 @@ $('uploadImageBtn').onclick=async()=>{
 
  msg('imageMsg','ছবি সফলভাবে আপলোড হয়েছে। লিংক: '+publicData.publicUrl,'success');
 };
-});// বাইরে ক্লিক করলে মেনু বন্ধ হবে
+// বাইরে ক্লিক করলে মেনু বন্ধ হবে
 document.addEventListener('click',e=>{
  if(!e.target.closest('.menu-area')){
   $('menuDropdown').classList.remove('show');
