@@ -509,6 +509,52 @@ document.querySelectorAll('[data-scroll]').forEach(btn=>{
    target.scrollIntoView({behavior:'smooth',block:'start'});
   }
  };
+ // ছবি আপলোড
+$('uploadImageBtn').onclick=async()=>{
+ const file=$('imageFile').files[0];
+ const type=$('imageType').value;
+
+ if(!file){
+  msg('imageMsg','আগে একটি ছবি নির্বাচন করুন।','error');
+  return;
+ }
+
+ if(!file.type.startsWith('image/')){
+  msg('imageMsg','শুধু ছবির ফাইল নির্বাচন করুন।','error');
+  return;
+ }
+
+ if(file.size>5*1024*1024){
+  msg('imageMsg','ছবির আকার ৫ MB-এর বেশি হতে পারবে না।','error');
+  return;
+ }
+
+ const ext=file.name.split('.').pop().toLowerCase();
+ const fileName=type+'/'+Date.now()+'-'+Math.random().toString(36).slice(2)+'.'+ext;
+
+ $('uploadImageBtn').disabled=true;
+ msg('imageMsg','ছবি আপলোড হচ্ছে...','success');
+
+ const {data,error}=await sb.storage
+  .from('website-images')
+  .upload(fileName,file,{
+   cacheControl:'3600',
+   upsert:false
+  });
+
+ $('uploadImageBtn').disabled=false;
+
+ if(error){
+  msg('imageMsg','ছবি আপলোড হয়নি: '+error.message,'error');
+  return;
+ }
+
+ const {data:publicData}=sb.storage
+  .from('website-images')
+  .getPublicUrl(data.path);
+
+ msg('imageMsg','ছবি সফলভাবে আপলোড হয়েছে। লিংক: '+publicData.publicUrl,'success');
+};
 });// বাইরে ক্লিক করলে মেনু বন্ধ হবে
 document.addEventListener('click',e=>{
  if(!e.target.closest('.menu-area')){
