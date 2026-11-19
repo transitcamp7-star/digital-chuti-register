@@ -426,7 +426,18 @@ document.querySelectorAll('[data-scroll]').forEach(btn=>{
    return;
   }
 
+  const panels=[
+   'passwordPanel','pinPanel','memberPanel','sectionPanel',
+   'postPanel','employeePanel','editEmployeePanel',
+   'leavePanel','editLeavePanel','entitlementPanel','employeesPanel'
+  ];
+
+  panels.forEach(id=>{
+   $(id).style.display='none';
+  });
+
   if(target){
+   target.style.display='block';
    target.scrollIntoView({behavior:'smooth',block:'start'});
   }
  };
