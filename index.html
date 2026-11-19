@@ -355,7 +355,29 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 let employees=[],leaveRecords=[],sections=[],posts=[],currentAdmin=null;
 const $=id=>document.getElementById(id);
+// থ্রি-ডট মেনু চালু
+$('menuToggle').onclick=()=>{
+ $('menuDropdown').classList.toggle('show');
+};
 
+document.querySelectorAll('[data-menu]').forEach(btn=>{
+ btn.onclick=()=>{
+  const tab=btn.dataset.menu;
+  document.querySelectorAll('.tab').forEach(t=>{
+   t.classList.toggle('active',t.dataset.tab===tab);
+  });
+  document.querySelectorAll('main > section').forEach(s=>{
+   s.classList.toggle('hidden',s.id!==tab);
+  });
+  $('menuDropdown').classList.remove('show');
+ };
+});
+
+document.addEventListener('click',e=>{
+ if(!e.target.closest('.menu-area')){
+  $('menuDropdown').classList.remove('show');
+ }
+});
 function msg(id,text,kind='status'){
  $(id).className='status '+kind;
  $(id).textContent=text;
