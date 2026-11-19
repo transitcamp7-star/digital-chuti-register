@@ -615,10 +615,25 @@ async function showAdmin(user){
 }
 
 $('logoutBtn').onclick=async()=>{
- await sb.auth.signOut();currentAdmin=null;
- $('adminPanel').classList.add('hidden');$('loginPanel').classList.remove('hidden');
-};
+ await sb.auth.signOut();
+ currentAdmin=null;
 
+ const panels=[
+  'passwordPanel','pinPanel','memberPanel','sectionPanel',
+  'postPanel','employeePanel','editEmployeePanel',
+  'leavePanel','editLeavePanel','entitlementPanel','employeesPanel'
+ ];
+
+ panels.forEach(id=>{
+  $(id).style.display='none';
+ });
+
+ $('adminPanel').classList.add('hidden');
+ $('loginPanel').classList.remove('hidden');
+ $('loginPanel').style.display='block';
+
+ $('menuDropdown').classList.remove('show');
+};
 // অ্যাডমিন পাসওয়ার্ড পরিবর্তন
 $('changeAdminPassword').onclick=async()=>{
  const current=$('currentAdminPassword').value;
