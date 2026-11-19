@@ -447,7 +447,45 @@ if(!currentAdmin || $('adminPanel').classList.contains('hidden')){
   $('adminPanel').scrollIntoView({behavior:'smooth'});
  };
 });
-// বাইরে ক্লিক করলে মেনু বন্ধ হবে
+// অ্যাডমিনের বিভিন্ন কাজের মেনু
+document.querySelectorAll('[data-scroll]').forEach(btn=>{
+ btn.onclick=()=>{
+  const target=$(btn.dataset.scroll);
+
+  document.querySelectorAll('.tab').forEach(t=>{
+   t.classList.toggle('active',t.dataset.tab==='admin');
+  });
+
+  document.querySelectorAll('main > section').forEach(s=>{
+   s.classList.toggle('hidden',s.id!=='admin');
+  });
+
+  $('menuDropdown').classList.remove('show');
+
+  if(!currentAdmin || $('adminPanel').classList.contains('hidden')){
+   $('loginPanel').classList.remove('hidden');
+   $('loginPanel').style.display='block';
+   $('loginPanel').scrollIntoView({behavior:'smooth'});
+   msg('loginMsg','প্রথমে অ্যাডমিন লগইন করুন।','error');
+   return;
+  }
+
+  const panels=[
+   'passwordPanel','pinPanel','memberPanel','sectionPanel',
+   'postPanel','employeePanel','editEmployeePanel',
+   'leavePanel','editLeavePanel','entitlementPanel','employeesPanel'
+  ];
+
+  panels.forEach(id=>{
+   $(id).style.display='none';
+  });
+
+  if(target){
+   target.style.display='block';
+   target.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+ };
+});// বাইরে ক্লিক করলে মেনু বন্ধ হবে
 document.addEventListener('click',e=>{
  if(!e.target.closest('.menu-area')){
   $('menuDropdown').classList.remove('show');
