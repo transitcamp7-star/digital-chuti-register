@@ -580,7 +580,8 @@ document.addEventListener('click',e=>{
  if(!e.target.closest('.menu-area')){
   $('menuDropdown').classList.remove('show');
  }
-});// ওয়েবসাইটের নাম লোড ও সংরক্ষণ
+});
+ // ওয়েবসাইটের নাম লোড ও সংরক্ষণ
 async function loadSiteSettings(){
  const {data,error}=await sb
   .from('site_settings')
