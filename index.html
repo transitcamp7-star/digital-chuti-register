@@ -205,6 +205,28 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 </div>
 
 <div id="adminPanel" class="hidden">
+ <!-- ছবি আপলোড প্যানেল -->
+<div class="panel" id="imagePanel">
+  <h2>ছবি আপলোড</h2>
+  <p class="muted">ওয়েবসাইটের লোগো, ব্যানার অথবা নোটিশের ছবি আপলোড করুন।</p>
+
+  <div class="field">
+    <label>ছবির ধরন নির্বাচন করুন</label>
+    <select id="imageType">
+      <option value="logo">ওয়েবসাইট লোগো</option>
+      <option value="banner">ওয়েবসাইট ব্যানার / কভার</option>
+      <option value="post">নোটিশ বা পোস্টের ছবি</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>ছবি নির্বাচন করুন</label>
+    <input id="imageFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+  </div>
+
+  <button type="button" id="uploadImageBtn">ছবি আপলোড করুন</button>
+  <div id="imageMsg"></div>
+</div>
 <div class="panel row">
 <div><h2>অ্যাডমিন ড্যাশবোর্ড</h2><span class="muted" id="adminEmail"></span></div>
 <button id="logoutBtn" class="secondary">লগআউট</button>
