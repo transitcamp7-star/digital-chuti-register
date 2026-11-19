@@ -211,6 +211,18 @@ footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
 </div>
 
 <div id="adminPanel" class="hidden">
+ <!-- সেটিংস প্যানেল -->
+<div class="panel" id="settingsPanel">
+  <h2>ওয়েবসাইট সেটিংস</h2>
+
+  <div class="field">
+    <label>ওয়েবসাইটের নাম</label>
+    <input id="newSiteName" type="text" placeholder="ওয়েবসাইটের নতুন নাম">
+  </div>
+
+  <button type="button" id="saveSiteName">নাম সংরক্ষণ করুন</button>
+  <div id="settingsMsg"></div>
+</div>
  <!-- ছবি আপলোড প্যানেল -->
 <div class="panel" id="imagePanel">
   <h2>ছবি আপলোড</h2>
